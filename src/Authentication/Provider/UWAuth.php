@@ -1,0 +1,127 @@
+<?php
+
+/**
+ * @file
+ * Contains \Drupal\uw_auth\Authentication\Provider\UWAuth.
+ */
+
+namespace Drupal\uw_auth\Authentication\Provider;
+
+use Drupal\Core\Url;
+use Drupal\Core\Authentication\AuthenticationProviderInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
+/**
+ * Class UWAuth.
+ *
+ * @package Drupal\uw_auth\Authentication\Provider
+ */
+class UWAuth implements AuthenticationProviderInterface {
+  /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+  
+  /**
+   * The entity manager.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
+   */
+  protected $entityManager;
+  
+  /**
+   * Constructs a HTTP basic authentication provider object.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager service.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager) {
+    $this->configFactory = $config_factory;
+    $this->entityManager = $entity_manager;
+  }
+  
+  /**
+   * Checks whether suitable authentication credentials are on the request.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   *
+   * @return bool
+   *   TRUE if authentication credentials suitable for this provider are on the
+   *   request, FALSE otherwise.
+   */
+  public function applies(Request $request) {
+    // If you return TRUE and the method Authentication logic fails,
+    // you will get out from Drupal navigation if you are logged in.
+    //return false;
+    return ($request->server->get('uwnetid') != '' && $request->query->get('shiblogin') == '1');
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function authenticate(Request $request) {
+	// Find the user	
+	$account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $request->server->get('uwnetid')));
+
+	// Create the user
+	if(!$account = reset($account_search)){
+		$account = \Drupal\user\Entity\User::create();
+		$account->setPassword(str_shuffle(md5(microtime()*rand(15,99999)).md5(microtime()))); // Set a dummy password
+		$account->enforceIsNew();
+		$account->setEmail($request->server->get('eppn'));
+		$account->setUsername($request->server->get('uwnetid'));
+		$account->activate();
+		$account->save();
+	}
+	
+	if($account){
+		user_login_finalize($account);
+		
+		$path = \Drupal::service('path.current')->getPath();
+		$query_string = explode('&', $request->getQueryString());
+		
+		if(($key = array_search('shiblogin=1', $query_string)) !== false) {
+		    unset($query_string[$key]);
+		}		
+		
+		$uri = $path.(is_array($query_string) && sizeof($query_string) > 0 ? '?'.implode('&', $query_string) : '');
+
+		$response = new RedirectResponse($uri);
+		$response->send();
+		
+		return $account;
+	}else{
+      throw new AccessDeniedHttpException();
+      return null;
+    }
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function cleanup(Request $request) {}
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function handleException(GetResponseForExceptionEvent $event) {
+    $exception = $event->getException();
+    if ($exception instanceof AccessDeniedHttpException) {
+      $event->setException(new UnauthorizedHttpException('Invalid consumer origin.', $exception));
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+}

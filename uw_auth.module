@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @file
+ * Contains uw_auth.module..
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function uw_auth_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the uw_auth module.
+    case 'help.page.uw_auth':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('UW Auth via weblogin') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function uw_auth_theme() {
+  $theme = [];
+
+  return $theme;
+}
+
+function Pre($string){
+	echo '<pre>';
+	print_r($string);
+	echo '</pre>';
+}

@@ -1,0 +1,7 @@
+name: UW Auth
+type: module
+description: UW Auth via weblogin
+core: 8.x
+package: uw_auth
+dependencies:
+  - block
