@@ -1,0 +1,7 @@
+uw_auth.uw_auth_settings_form:
+  title: 'UW Auth Settings'
+  route_name: uw_auth.uw_auth_settings_form
+  description: 'UW Auth variables and config settings'
+  parent: system.admin_config_system
+  weight: 99
+

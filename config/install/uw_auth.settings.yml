@@ -1,0 +1,4 @@
+email_field: 'eppn'
+username_field: 'uwnetid'
+force_uw_groups: 0
+autocreate_accounts: 0
