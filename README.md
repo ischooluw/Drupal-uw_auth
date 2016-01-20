@@ -47,4 +47,4 @@ Recommended: Alternatively add this to your apache site config instead. This ens
 ### Want to contribute? ###
 
 * Fork us and send pull requests
-* Alternatively email me nickwest@uw.edu and we can chat
+* Alternatively email me nickwest at uw.edu and we can chat
