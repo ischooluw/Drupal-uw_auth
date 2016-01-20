@@ -26,7 +26,7 @@ This module requires Apache with mod_shib installed and was designed to work wit
 * Clone the repo into your modules directory and use the d8-stable branch
 * Install the module in Drupal 
 * Configuration will appear under System (be sure to give yourself permission)
-* Htaccess or Apache config changes (see below)
+* htaccess or Apache config changes (see below)
 
 
 ### htaccess or Apache config ###
