@@ -6,6 +6,7 @@ This module requires Apache with mod_shib installed and was designed to work wit
 
 ### Requirements ###
 
+* Drupal 8
 * Apache + mod_shib
 * shibd (or other shibboleth daemon feeding mod_shib)
 * htaccess or apache config change to "turn on" shibboleth
