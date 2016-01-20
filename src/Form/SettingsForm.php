@@ -63,6 +63,15 @@ class SettingsForm extends ConfigFormBase {
 		'#maxlength' => 256,
 		'#required' => TRUE,
 	);
+	$form['basic']['login_link'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Login Path'),
+		'#description' => t('This is the path to shibboleth for logins'),
+		'#default_value' => $this->config('uw_auth.settings')->get('login_link'),
+		'#size' => 25,
+		'#maxlength' => 256,
+		'#required' => TRUE,
+	);
 	
 	$form['other'] = array(
 		'#type' => 'fieldset',
@@ -110,6 +119,7 @@ class SettingsForm extends ConfigFormBase {
     $this->config('uw_auth.settings')
       ->set('username_field', $form_state->getValue('username_field'))
       ->set('email_field', $form_state->getValue('email_field'))
+      ->set('login_link', $form_state->getValue('login_link'))
       ->set('autocreate_accounts', $form_state->getValue('autocreate_accounts'))
       ->set('force_uw_groups', $form_state->getValue('force_uw_groups'))
       ->save();
