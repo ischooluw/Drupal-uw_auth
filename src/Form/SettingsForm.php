@@ -50,7 +50,7 @@ class SettingsForm extends ConfigFormBase {
 		'#title' => t('Username Variable'),
 		'#description' => t('This is the environment variable from mod_shib that will be used to match to Drupal username'),
 		'#default_value' => $this->config('uw_auth.settings')->get('username_field'),
-		'#size' => 10,
+		'#size' => 15,
 		'#maxlength' => 256,
 		'#required' => TRUE,
 	);	
@@ -59,16 +59,16 @@ class SettingsForm extends ConfigFormBase {
 		'#title' => t('Email Variable'),
 		'#description' => t('This is the environment variable from mod_shib that will be used to match email address'),
 		'#default_value' => $this->config('uw_auth.settings')->get('email_field'),
-		'#size' => 10,
+		'#size' => 15,
 		'#maxlength' => 256,
 		'#required' => TRUE,
 	);
 	$form['basic']['login_link'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Login Path'),
-		'#description' => t('This is the path to shibboleth for logins'),
+		'#description' => t('This is the path to shibboleth for logins. The current domain and site path will be substituted for CURRENT_PATH'),
 		'#default_value' => $this->config('uw_auth.settings')->get('login_link'),
-		'#size' => 25,
+		'#size' => 40,
 		'#maxlength' => 256,
 		'#required' => TRUE,
 	);
@@ -86,7 +86,7 @@ class SettingsForm extends ConfigFormBase {
 		'#title' => 'Automatically create user accounts?',
 		'#return_value' => 1,
 		'#default_value' => $this->config('uw_auth.settings')->get('autocreate_accounts'),
-		'#description' => t('If set to true, anyone with a valid Shibboleth login will have a user account created for them.'),
+		'#description' => t('If set to true, anyone with a valid Shibboleth login will have a user account created for them'),
 	);
 	
 	if(\Drupal::moduleHandler()->moduleExists('uw_groups')){
@@ -95,7 +95,7 @@ class SettingsForm extends ConfigFormBase {
 			'#title' => 'Only allow users with valid UW Groups?',
 			'#return_value' => 1,
 			'#default_value' => $this->config('uw_auth.settings')->get('force_uw_groups'),
-			'#description' => t('If checked, only users with a UW Group that is active within the UW Groups module will be allowed to log in.'),
+			'#description' => t('If checked, only users with a UW Group that is active within the UW Groups module will be allowed to log in or create an account'),
 		);
 	}
 	

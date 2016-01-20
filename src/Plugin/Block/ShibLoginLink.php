@@ -36,15 +36,18 @@ class ShibLoginLink extends BlockBase {
 	}
 	
 	// Get the actual path
-	$path = substr(\Drupal::request()->getRequestUri(), 0, strpos(\Drupal::request()->getRequestUri(), '?'));
+	$path = $base_url.substr(\Drupal::request()->getRequestUri(), 0, strpos(\Drupal::request()->getRequestUri(), '?'));
 	
 	// Add shiblogin to query string
-	$qs[] = 'shiblogin=1';
+	$qs[] = 'shiblogin=1';	
+	
+	$path = str_replace('CURRENT_PATH', $path, \Drupal::config('uw_auth.settings')->get('login_link'));
 	
 	// build the target url
 	$target = $base_url.$path.'/?'.implode('&',$qs);
 
     $build = [];
+	$url = 
     $build['shib_login']['#markup'] = '<a href="/Shibboleth.sso/DS?target='.$target.'">Login</a>';
 	
 	return $build;
