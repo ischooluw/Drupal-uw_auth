@@ -32,10 +32,14 @@ This module requires Apache with mod_shib installed and was designed to work wit
 ### htaccess or Apache config ###
 
 in htaccess add this block:
+
+```
+#!text
 AuthType Shibboleth
 ShibRequireSession Off
 ShibUseHeaders On
 Require shibboleth
+```
 
 Recommended: Alternatively add this to your apache site config instead. This ensures the change will persist through Drupal upgrades.
 
