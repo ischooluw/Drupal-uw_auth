@@ -45,9 +45,9 @@ class ShibLoginLink extends BlockBase {
 
     // build the target url
     $target = $base_url.$path.'/?'.implode('&',$qs);
-  
+
     $build = [];
-    $url = $build['shib_login']['#markup'] = '<a href="/Shibboleth.sso/DS?target='.$target.'">Login</a>';
+    $url = $build['shib_login']['#markup'] = '<a href="'.$target.'">Login</a>';
   
     return $build;
   }
