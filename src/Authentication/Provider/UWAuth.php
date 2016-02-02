@@ -29,14 +29,14 @@ class UWAuth implements AuthenticationProviderInterface {
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
-  
+
   /**
    * The entity manager.
    *
    * @var \Drupal\Core\Entity\EntityManagerInterface
    */
   protected $entityManager;
-  
+
   /**
    * Constructs a HTTP basic authentication provider object.
    *
@@ -49,7 +49,7 @@ class UWAuth implements AuthenticationProviderInterface {
     $this->configFactory = $config_factory;
     $this->entityManager = $entity_manager;
   }
-  
+
   /**
    * Checks whether suitable authentication credentials are on the request.
    *
@@ -65,75 +65,75 @@ class UWAuth implements AuthenticationProviderInterface {
     // you will get out from Drupal navigation if you are logged in.
     //return false;
     return (
-    	$request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')) != '' && 
-    	$request->server->get(\Drupal::config('uw_auth.settings')->get('email_field')) != '' && 
-    	$request->query->get('shiblogin') == '1'
+  	  $request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')) != '' && 
+  	  $request->server->get(\Drupal::config('uw_auth.settings')->get('email_field')) != '' && 
+  	  $request->query->get('shiblogin') == '1'
     );
   }
-  
+
   /**
    * {@inheritdoc}
    */
   public function authenticate(Request $request) {
-	
-	if(\Drupal::config('uw_auth.settings')->get('force_uw_groups')){
-		$NetIDGroups = new \Drupal\uw_groups\NetIDGroups();
-		
-		if($request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')) != ''){
-			if(!$NetIDGroups->isNetIDInAnyActiveGroup($request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')))){
-				throw new AccessDeniedHttpException();
-				return null;
-			}
-		}else{
-			throw new AccessDeniedHttpException();
-			return null;
-		}
-	}
-	  
-	// Find the user	
-	$account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $request->server->get(\Drupal::config('uw_auth.settings')->get('username_field'))));
 
-	// Create the user
-	if(\Drupal::config('uw_auth.settings')->get('autocreate_accounts') && !$account = reset($account_search)){
-		$account = \Drupal\user\Entity\User::create();
-		$account->setPassword(str_shuffle(md5(microtime()*rand(15,99999)).md5(microtime()))); // Set a dummy password
-		$account->enforceIsNew();
-		$account->setEmail($request->server->get(\Drupal::config('uw_auth.settings')->get('email_field')));
-		$account->setUsername($request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')));
-		$account->activate();
-		$account->save();
-	}elseif(!$account = reset($account_search)){
-		throw new AccessDeniedHttpException();
-		return null;
-	}
-	
-	if($account){
-		user_login_finalize($account);
-		
-		$path = \Drupal::service('path.current')->getPath();
-		$query_string = explode('&', $request->getQueryString());
-		
-		if(($key = array_search('shiblogin=1', $query_string)) !== false) {
-		    unset($query_string[$key]);
-		}		
-		
-		$uri = $path.(is_array($query_string) && sizeof($query_string) > 0 ? '?'.implode('&', $query_string) : '');
-
-		$response = new RedirectResponse($uri);
-		$response->send();
-		
-		return $account;
-	}else{
+  if(\Drupal::config('uw_auth.settings')->get('force_uw_groups')){
+    $NetIDGroups = new \Drupal\uw_groups\NetIDGroups();
+  
+    if($request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')) != ''){
+      if(!$NetIDGroups->isNetIDInAnyActiveGroup($request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')))){
+        throw new AccessDeniedHttpException();
+        return null;
+      }
+    }else{
       throw new AccessDeniedHttpException();
       return null;
     }
   }
-  
+
+  // Find the user	
+  $account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $request->server->get(\Drupal::config('uw_auth.settings')->get('username_field'))));
+
+  // Create the user
+  if(\Drupal::config('uw_auth.settings')->get('autocreate_accounts') && !$account = reset($account_search)){
+    $account = \Drupal\user\Entity\User::create();
+    $account->setPassword(str_shuffle(md5(microtime()*rand(15,99999)).md5(microtime()))); // Set a dummy password
+    $account->enforceIsNew();
+    $account->setEmail($request->server->get(\Drupal::config('uw_auth.settings')->get('email_field')));
+    $account->setUsername($request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')));
+    $account->activate();
+    $account->save();
+  }elseif(!$account = reset($account_search)){
+    throw new AccessDeniedHttpException();
+    return null;
+  }
+
+  if($account){
+    user_login_finalize($account);
+
+    $path = \Drupal::service('path.current')->getPath();
+    $query_string = explode('&', $request->getQueryString());
+
+    if(($key = array_search('shiblogin=1', $query_string)) !== false) {
+        unset($query_string[$key]);
+    }		
+
+    $uri = $path.(is_array($query_string) && sizeof($query_string) > 0 ? '?'.implode('&', $query_string) : '');
+
+    $response = new RedirectResponse($uri);
+    $response->send();
+
+    return $account;
+  }else{
+      throw new AccessDeniedHttpException();
+      return null;
+    }
+  }
+
   /**
    * {@inheritdoc}
    */
   public function cleanup(Request $request) {}
-  
+
   /**
    * {@inheritdoc}
    */
