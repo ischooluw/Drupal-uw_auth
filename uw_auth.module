@@ -33,7 +33,7 @@ function uw_auth_theme() {
 }
 
 function Pre($string){
-	echo '<pre>';
-	print_r($string);
-	echo '</pre>';
+  echo '<pre>';
+  print_r($string);
+  echo '</pre>';
 }
