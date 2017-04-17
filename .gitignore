@@ -1,0 +1,12 @@
+# VIM tempfiles
+*~
+*.swp
+*.swo
+
+# Desktop temp files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Composer paths
+vendor/
