@@ -1,0 +1,4 @@
+administer uw auth:
+  title: 'Administer UW Auth'
+  description: 'Adjust UW Auth paths and other important things'
+  restrict access: TRUE
