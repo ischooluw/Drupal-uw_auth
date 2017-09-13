@@ -53,5 +53,6 @@ Recommended: Alternatively add this to your apache site config instead. This ens
 ### Changelog ###
 
 v1.01
+
 * Changed permission from "access administration pages" to "administer uw auth"
 * Added .gitignore with some typical files to ignore
