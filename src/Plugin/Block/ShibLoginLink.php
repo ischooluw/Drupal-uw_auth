@@ -39,7 +39,7 @@ class ShibLoginLink extends BlockBase {
     $shibauth = $this->_get_shiblink();
     
     return array(
-      '#theme' => 'uwt_dev_auth',
+      '#theme' => 'uw_auth',
       '#shibauth' => $shibauth,
       '#base_url' => $base_url,
       '#uid' => $uid,
