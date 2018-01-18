@@ -23,33 +23,49 @@ class ShibLoginLink extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build(){
+  public function build() {
     global $base_url;
-
-    // Preserve Query string
-    $query_string = substr(\Drupal::request()->getRequestUri(), strpos(\Drupal::request()->getRequestUri(), '?'));
-
-    if(strpos($query_string, '?') !== false && strlen($query_string) > 1){
-      $qs = explode('&', substr($query_string, 1));
-    }else{
-      $qs = array();
+    
+    $current_user = \Drupal::currentUser();
+    $uname = null;
+    $uid = null;
+    $isannon = true;
+    if (!$current_user->isAnonymous()) {
+      $isannon = false;
+      $uid = $current_user->id();
+      $uname = $current_user->getAccountName();
     }
 
-    // Get the actual path
-    $path = $base_url.substr(\Drupal::request()->getRequestUri(), 0, strpos(\Drupal::request()->getRequestUri(), '?'));
-
-    // Add shiblogin to query string
-    $qs[] = 'shiblogin=1';	
-
-    $path = str_replace('CURRENT_PATH', $path, \Drupal::config('uw_auth.settings')->get('login_link'));
-
-    // build the target url
-    $target = $base_url.$path.'/?'.implode('&',$qs);
-
-    $build = [];
-    $url = $build['shib_login']['#markup'] = '<a href="'.$target.'">Login</a>';
-  
-    return $build;
+    $shibauth = $this->_get_shiblink();
+    
+    return array(
+      '#theme' => 'uwt_dev_auth',
+      '#shibauth' => $shibauth,
+      '#base_url' => $base_url,
+      '#uid' => $uid,
+      '#uname' => $uname,
+      '#isannon' => $isannon,
+      '#cache' => array('max-age' => 0,),
+    );
   }
 
+  // Returns the Shibboleth login link.
+  private function _get_shiblink() {
+    
+    // Preserve Query string
+    $query_string = \Drupal::request()->getQueryString();
+    $qs = (strlen($query_string) >= 1) ? explode('&', $query_string) : array();
+
+    // Prepend shiblogin to query string array
+    array_unshift($qs,'shiblogin=1');	
+
+    // build the target url
+    $path = \Drupal::request()->getSchemeAndHttpHost() . \Drupal::request()->getBaseUrl() . \Drupal::request()->getPathInfo();
+    $shibll = \Drupal::config('uw_auth.settings')->get('login_link');
+    $shibll = Url::fromUserInput($shibll,['absolute' => true, 'https' => true])->toString(); 
+    $shibll = str_replace('CURRENT_PATH', $path, $shibll);
+
+    $shibll .= '?' . implode('&',$qs);
+    return $shibll;
+  }
 }

@@ -110,7 +110,7 @@ class UWAuth implements AuthenticationProviderInterface {
   if($account){
     user_login_finalize($account);
 
-    $path = \Drupal::service('path.current')->getPath();
+    $path = $request->getSchemeAndHttpHost() . $request->getBaseUrl() . $request->getPathInfo();
     $query_string = explode('&', $request->getQueryString());
 
     if(($key = array_search('shiblogin=1', $query_string)) !== false) {

@@ -27,7 +27,16 @@ function uw_auth_help($route_name, RouteMatchInterface $route_match) {
  * Implements hook_theme().
  */
 function uw_auth_theme() {
-  $theme = [];
-
-  return $theme;
-}
+  return array('uw_auth' => 
+    array(
+      'variables' => array(
+        'shibauth' => null,
+        'base_url' => null,
+        'uid' => null,
+        'uname' => null,
+        'isannon' => null,
+      ),
+      'template' => 'uw_auth',
+    )
+  );
+}}
