@@ -39,4 +39,4 @@ function uw_auth_theme() {
       'template' => 'uwt_dev_auth',
     )
   );
-}}
+}
