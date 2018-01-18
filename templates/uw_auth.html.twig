@@ -1,0 +1,23 @@
+<!-- Add you custom twig html here -->
+{#
+/**
+ * @file
+ * Default theme implementation of Shibboleth Auth Block.
+ *
+ * Available variables:
+ *   - shibauth,
+ *   - base_url,
+ *   - uid,
+ *   - uname,
+ *   - isannon
+ *
+ * @ingroup themeable
+ */
+#}
+<div>
+{% if isannon == true %}
+    <a href="{{ shibauth }}">UWNetID login</a>
+{% else %}
+    {{ uname }}&nbsp;|&nbsp;<a href="{{ base_url }}/user/logout">Logout</a>
+{% endif %}
+</div>
