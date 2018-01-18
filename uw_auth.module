@@ -36,7 +36,7 @@ function uw_auth_theme() {
         'uname' => null,
         'isannon' => null,
       ),
-      'template' => 'uwt_dev_auth',
+      'template' => 'uw_auth',
     )
   );
 }
