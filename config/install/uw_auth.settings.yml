@@ -3,3 +3,5 @@ username_field: 'uwnetid'
 force_uw_groups: 0
 autocreate_accounts: 0
 login_link: '/Shibboleth.sso/DS?target=CURRENT_PATH'
+captcha_site_key: ''
+captcha_site_secret: ''
