@@ -72,6 +72,24 @@ class SettingsForm extends ConfigFormBase {
       '#maxlength' => 256,
       '#required' => TRUE,
     );
+    $form['basic']['captcha_site_key'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Captcha Site Key'),
+      '#description' => t('This is the public, front-facing key used for Google ReCaptcha authorization'),
+      '#default_value' => $this->config('uw_auth.settings')->get('captcha_site_key'),
+      '#size' => 40,
+      '#maxlength' => 256,
+      '#required' => TRUE,
+    );
+    $form['basic']['captcha_site_secret'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Captcha Site Secret'),
+      '#description' => t('This is the secret used for Google ReCaptcha authorization'),
+      '#default_value' => $this->config('uw_auth.settings')->get('captcha_site_secret'),
+      '#size' => 40,
+      '#maxlength' => 256,
+      '#required' => TRUE,
+    );
     
     $form['other'] = array(
       '#type' => 'fieldset',
@@ -120,6 +138,8 @@ class SettingsForm extends ConfigFormBase {
       ->set('username_field', $form_state->getValue('username_field'))
       ->set('email_field', $form_state->getValue('email_field'))
       ->set('login_link', $form_state->getValue('login_link'))
+      ->set('captcha_site_key', $form_state->getValue('captcha_site_key'))
+      ->set('captcha_site_secret', $form_state->getValue('captcha_site_secret'))
       ->set('autocreate_accounts', $form_state->getValue('autocreate_accounts'))
       ->set('force_uw_groups', $form_state->getValue('force_uw_groups'))
       ->save();
