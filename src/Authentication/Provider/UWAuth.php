@@ -23,32 +23,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  * @package Drupal\uw_auth\Authentication\Provider
  */
 class UWAuth implements AuthenticationProviderInterface {
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The entity manager.
-   *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
-   */
-  protected $entityManager;
-
-  /**
-   * Constructs a HTTP basic authentication provider object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager service.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager) {
-    $this->configFactory = $config_factory;
-    $this->entityManager = $entity_manager;
-  }
 
   /**
    * Checks whether suitable authentication credentials are on the request.
@@ -80,20 +54,19 @@ class UWAuth implements AuthenticationProviderInterface {
 
       if($request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')) != ''){
         if(!$NetIDGroups->isNetIDInAnyActiveGroup($request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')))){
-          throw new AccessDeniedHttpException();
           return null;
         }
       }else{
-        throw new AccessDeniedHttpException();
         return null;
       }
     }
 
     // Find the user
-    $account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $request->server->get(\Drupal::config('uw_auth.settings')->get('username_field'))));
+    // $account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $request->server->get(\Drupal::config('uw_auth.settings')->get('username_field'))));
+    $account = user_load_by_name($request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')));
 
     // Create the user
-    if(\Drupal::config('uw_auth.settings')->get('autocreate_accounts') && !$account = reset($account_search)){
+    if(\Drupal::config('uw_auth.settings')->get('autocreate_accounts') && !$account){
       $account = \Drupal\user\Entity\User::create();
       $account->setPassword(str_shuffle(md5(microtime()*rand(15,99999)).md5(microtime()))); // Set a dummy password
       $account->enforceIsNew();
@@ -101,39 +74,19 @@ class UWAuth implements AuthenticationProviderInterface {
       $account->setUsername($request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')));
       $account->activate();
       $account->save();
-    }elseif(!$account = reset($account_search)){
-      throw new AccessDeniedHttpException();
+    }elseif(!$account){
       return null;
     }
 
 
 
     if($account){
-
       user_login_finalize($account);
 
       return $account;
     }else{
-      throw new AccessDeniedHttpException();
       return null;
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function cleanup(Request $request) {}
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleException(GetResponseForExceptionEvent $event) {
-    $exception = $event->getException();
-    if ($exception instanceof AccessDeniedHttpException) {
-      $event->setException(new UnauthorizedHttpException('Invalid consumer origin.', $exception));
-      return TRUE;
-    }
-    return FALSE;
   }
 
 }

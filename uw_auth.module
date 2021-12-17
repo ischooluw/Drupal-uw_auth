@@ -58,8 +58,11 @@ function uw_auth_preprocess_page(&$vars){
     if($request->query->get('target')) {
       $uri = $request->query->get('target');
     }
+    $request->getSession()->save();
 
     $response = new \Symfony\Component\HttpFoundation\RedirectResponse($uri);
+
+    \Drupal::service('kernel')->terminate($request, $response);
     $response->send();
   }
 }
