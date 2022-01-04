@@ -15,4 +15,5 @@ uw_auth.authenticate:
   requirements:
     _permission: 'use uw auth'
   options:
-    _auth: ['uw_auth']
+    _auth: ['uw_auth', 'cookie']
+    no_cache: TRUE

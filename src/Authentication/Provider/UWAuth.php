@@ -49,9 +49,9 @@ class UWAuth implements AuthenticationProviderInterface {
     // you will get out from Drupal navigation if you are logged in.
     //return false;
     return (
-  	  $request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')) != '' &&
-  	  $request->server->get(\Drupal::config('uw_auth.settings')->get('email_field')) != '' &&
-  	  $request->query->get('shiblogin') == '1'
+  	  $request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')) != ''
+      && $request->server->get(\Drupal::config('uw_auth.settings')->get('email_field')) != ''
+      && $request->query->get('shiblogin') == '1'
     );
   }
 

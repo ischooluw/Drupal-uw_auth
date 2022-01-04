@@ -34,27 +34,14 @@ class AuthController extends ControllerBase {
     }
 
   function loginShib(){
+    \Drupal::service('page_cache_kill_switch')->trigger();
+
     $uri = $this->request->getSchemeAndHttpHost() . $this->request->getBaseUrl();
 
     if($this->request->query->get('target')) {
       $uri = $this->request->query->get('target');
     }
-    $this->request->getSession()->save();
 
-    // $user = \Drupal::currentUser();
-    // print_r($user);die;
-    // // print_r($user);
-    // if($user){
-    //   // user_login_finalize($user);
-    // }
-
-    // print_r($this->request->server->all());
-    // die;
-
-    // $response = new \Symfony\Component\HttpFoundation\RedirectResponse($uri);
-
-    // \Drupal::service('kernel')->terminate($this->request, $response);
-    // $response->send();
     return array(
       '#theme' => 'redirect',
       '#title' => 'Auth redirect',
@@ -62,10 +49,10 @@ class AuthController extends ControllerBase {
       '#page_title' => 'iSchool Events',
       '#target_url' => $uri,
       '#cache' => [
-        'keys' => ['special-key'],
+        'keys' => ['uw_auth'],
         'contexts' => ['user.roles', 'url.query_args:target', 'session.exists'],
         'max-age' => 1,
-        'tags' => ['special-tag'],
+        'tags' => ['uw_auth'],
       ],
     );
   }
