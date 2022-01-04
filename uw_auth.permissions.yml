@@ -2,3 +2,7 @@ administer uw auth:
   title: 'Administer UW Auth'
   description: 'Adjust UW Auth paths and other important things'
   restrict access: TRUE
+use uw auth:
+  title: 'Login via UW Auth'
+  description: 'User can access the ?shiblogin path and login via this module'
+  restrict access: FALSE

@@ -7,3 +7,12 @@ uw_auth.uw_auth_settings_form:
     _permission: 'administer uw auth'
   options:
     _admin_route: TRUE
+
+uw_auth.authenticate:
+  path: '/uwlogin'
+  defaults:
+    _controller: '\Drupal\uw_auth\Controller\AuthController::loginShib'
+  requirements:
+    _permission: 'use uw auth'
+  options:
+    _auth: ['uw_auth']

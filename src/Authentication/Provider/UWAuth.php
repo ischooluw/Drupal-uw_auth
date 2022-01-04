@@ -11,6 +11,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Authentication\AuthenticationProviderInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\user\UserAuthInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -23,6 +24,23 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  * @package Drupal\uw_auth\Authentication\Provider
  */
 class UWAuth implements AuthenticationProviderInterface {
+
+  protected $configManager;
+  protected $entityManager;
+
+  public function __construct(ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager) {
+
+    $this->configFactory = $config_factory;
+    $this->entityManager = $entity_manager;
+  }
+
+  // public static function create(ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager) {
+  //   return new static(
+  //     $config_factory,
+  //     $entity_manager
+  //   );
+  // }
+
 
   /**
    * Checks whether suitable authentication credentials are on the request.
@@ -62,8 +80,13 @@ class UWAuth implements AuthenticationProviderInterface {
     }
 
     // Find the user
-    // $account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $request->server->get(\Drupal::config('uw_auth.settings')->get('username_field'))));
-    $account = user_load_by_name($request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')));
+    $account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $request->server->get(\Drupal::config('uw_auth.settings')->get('username_field'))));
+    // $account = user_load_by_name($request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')));
+
+    $account = null;
+    if(is_array($account_search)){
+      $account = current($account_search);
+    }
 
     // Create the user
     if(\Drupal::config('uw_auth.settings')->get('autocreate_accounts') && !$account){
