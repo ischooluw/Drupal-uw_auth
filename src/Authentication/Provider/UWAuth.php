@@ -34,14 +34,6 @@ class UWAuth implements AuthenticationProviderInterface {
     $this->entityManager = $entity_manager;
   }
 
-  // public static function create(ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager) {
-  //   return new static(
-  //     $config_factory,
-  //     $entity_manager
-  //   );
-  // }
-
-
   /**
    * Checks whether suitable authentication credentials are on the request.
    *
