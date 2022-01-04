@@ -7,16 +7,17 @@
 
 namespace Drupal\uw_auth\Authentication\Provider;
 
-use Drupal\Core\Url;
 use Drupal\Core\Authentication\AuthenticationProviderInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\user\UserAuthInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Drupal\Core\Url;
+
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class UWAuth.
@@ -96,7 +97,7 @@ class UWAuth implements AuthenticationProviderInterface {
 
 
     if($account){
-      user_login_finalize($account);
+      // user_login_finalize($account);
 
       return $account;
     }else{

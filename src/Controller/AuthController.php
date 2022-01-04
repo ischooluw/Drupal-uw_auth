@@ -6,30 +6,36 @@
 
 namespace Drupal\uw_auth\Controller;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\image\Entity\ImageStyle;
 
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 
 class AuthController extends ControllerBase {
 
     /** Dependency injection **/
     protected $request;
+    protected $entityManager;
 
-    public function __construct(RequestStack $request_stack) {
+    public function __construct(RequestStack $request_stack, EntityManagerInterface $entity_manager) {
       // print_r($request_stack->getCurrentRequest()->request);
       $this->request = $request_stack->getCurrentRequest();
+      $this->entityManager = $entity_manager;
     }
 
     public static function create(ContainerInterface $container) {
       return new static(
-        $container->get('request_stack')
+        $container->get('request_stack'),
+        $container->get('entity.manager'),
       );
     }
 
@@ -40,6 +46,55 @@ class AuthController extends ControllerBase {
 
     if($this->request->query->get('target')) {
       $uri = $this->request->query->get('target');
+    }
+
+    if(
+  	  $this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')) != ''
+      && $this->request->server->get(\Drupal::config('uw_auth.settings')->get('email_field')) != ''
+      && $this->request->query->get('shiblogin') == '1'
+    ){
+      if(\Drupal::config('uw_auth.settings')->get('force_uw_groups')){
+        $NetIDGroups = new \Drupal\uw_groups\NetIDGroups();
+
+        if($this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')) != ''){
+          if(!$NetIDGroups->isNetIDInAnyActiveGroup($this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')))){
+            return null;
+          }
+        }else{
+          return null;
+        }
+      }
+
+      // Find the user
+      $account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field'))));
+      // $account = user_load_by_name($this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')));
+
+      $account = null;
+      if(is_array($account_search)){
+        $account = current($account_search);
+      }
+
+      // Create the user
+      if(\Drupal::config('uw_auth.settings')->get('autocreate_accounts') && !$account){
+        $account = \Drupal\user\Entity\User::create();
+        $account->setPassword(str_shuffle(md5(microtime()*rand(15,99999)).md5(microtime()))); // Set a dummy password
+        $account->enforceIsNew();
+        $account->setEmail($this->request->server->get(\Drupal::config('uw_auth.settings')->get('email_field')));
+        $account->setUsername($this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')));
+        $account->activate();
+        $account->save();
+      }elseif(!$account){
+        throw new AccessDeniedHttpException();
+      }
+
+
+      if($account){
+        user_login_finalize($account);
+      }else{
+        throw new AccessDeniedHttpException();
+      }
+    }else{
+      throw new AccessDeniedHttpException();
     }
 
     return array(
