@@ -58,10 +58,10 @@ class AuthController extends ControllerBase {
 
         if($this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')) != ''){
           if(!$NetIDGroups->isNetIDInAnyActiveGroup($this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')))){
-            return null;
+            throw new AccessDeniedHttpException();
           }
         }else{
-          return null;
+          throw new AccessDeniedHttpException();
         }
       }
 
