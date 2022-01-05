@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\ischool_pages\Controller\ImpactStoriesController.
+ * Contains \Drupal\uw_auth\Controller\AuthController.
  */
 
 namespace Drupal\uw_auth\Controller;
@@ -48,25 +48,24 @@ class AuthController extends ControllerBase {
       $uri = $this->request->query->get('target');
     }
 
-    if(
-  	  $this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')) != ''
-      && $this->request->server->get(\Drupal::config('uw_auth.settings')->get('email_field')) != ''
+    $netid = $this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field'));
+    $email = $this->request->server->get(\Drupal::config('uw_auth.settings')->get('email_field'));
+
+    if( $netid != ''
+      && $email != ''
       && $this->request->query->get('shiblogin') == '1'
     ){
       if(\Drupal::config('uw_auth.settings')->get('force_uw_groups')){
         $NetIDGroups = new \Drupal\uw_groups\NetIDGroups();
 
-        if($this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')) != ''){
-          if(!$NetIDGroups->isNetIDInAnyActiveGroup($this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')))){
-            throw new AccessDeniedHttpException();
-          }
-        }else{
+        if(!$NetIDGroups->isNetIDInAnyActiveGroup($netid)){
+          \Drupal::logger('uw_auth')->notice('UW Auth - Netid = '.$netid.' - Not in active group');
           throw new AccessDeniedHttpException();
         }
       }
 
       // Find the user
-      $account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field'))));
+      $account_search = $this->entityManager->getStorage('user')->loadByProperties(array('name' => $netid));
       // $account = user_load_by_name($this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')));
 
       $account = null;
@@ -79,8 +78,8 @@ class AuthController extends ControllerBase {
         $account = \Drupal\user\Entity\User::create();
         $account->setPassword(str_shuffle(md5(microtime()*rand(15,99999)).md5(microtime()))); // Set a dummy password
         $account->enforceIsNew();
-        $account->setEmail($this->request->server->get(\Drupal::config('uw_auth.settings')->get('email_field')));
-        $account->setUsername($this->request->server->get(\Drupal::config('uw_auth.settings')->get('username_field')));
+        $account->setEmail($email);
+        $account->setUsername($netid);
         $account->activate();
         $account->save();
       }elseif(!$account){
@@ -91,9 +90,11 @@ class AuthController extends ControllerBase {
       if($account){
         user_login_finalize($account);
       }else{
+        \Drupal::logger('uw_auth')->notice('UW Auth - netid='.$netid.' - Account not found');
         throw new AccessDeniedHttpException();
       }
     }else{
+      \Drupal::logger('uw_auth')->notice('UW Auth - netid='.$netid.' email='.$email.' - Missing auth variable');
       throw new AccessDeniedHttpException();
     }
 
