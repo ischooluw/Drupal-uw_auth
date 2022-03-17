@@ -10,9 +10,10 @@ use Drupal\Core\Routing\RouteMatchInterface;
 /**
  * Implements hook_help().
  */
-function uw_auth_help($route_name, RouteMatchInterface $route_match) {
+function uw_auth_help($route_name, RouteMatchInterface $route_match)
+{
   switch ($route_name) {
-    // Main module help for the uw_auth module.
+      // Main module help for the uw_auth module.
     case 'help.page.uw_auth':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
@@ -26,8 +27,10 @@ function uw_auth_help($route_name, RouteMatchInterface $route_match) {
 /**
  * Implements hook_theme().
  */
-function uw_auth_theme() {
-  return array('uw_auth' =>
+function uw_auth_theme()
+{
+  return array(
+    'uw_auth' =>
     array(
       'variables' => array(
         'shibauth' => null,
@@ -48,14 +51,15 @@ function uw_auth_theme() {
  *  Clean up shiblogin & target query strings after Shib login
  *  Redirect to destination if target is specified
  */
-function uw_auth_preprocess_page(&$vars){
+function uw_auth_preprocess_page(&$vars)
+{
 
   $request = \Drupal::request();
 
-  if($request->query->get('target') || $request->query->get('shiblogin')){
+  if ($request->query->get('target') || $request->query->get('shiblogin')) {
     $uri = $request->getSchemeAndHttpHost() . $request->getBaseUrl() . $request->getPathInfo();
 
-    if($request->query->get('target')) {
+    if ($request->query->get('target')) {
       $uri = $request->query->get('target');
     }
     $request->getSession()->save();

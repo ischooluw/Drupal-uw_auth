@@ -18,12 +18,14 @@ use Drupal\Core\Block\BlockBase;
  *  admin_label = @Translation("Shib login link"),
  * )
  */
-class ShibLoginLink extends BlockBase {
+class ShibLoginLink extends BlockBase
+{
 
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build()
+  {
     global $base_url;
 
     $current_user = \Drupal::currentUser();
@@ -50,22 +52,23 @@ class ShibLoginLink extends BlockBase {
   }
 
   // Returns the Shibboleth login link.
-  private function _get_shiblink() {
+  private function _get_shiblink()
+  {
 
     // Preserve Query string
     $query_string = \Drupal::request()->getQueryString();
     $qs = (strlen($query_string) >= 1) ? explode('&', $query_string) : array();
 
     // Prepend shiblogin to query string array
-    array_unshift($qs,'shiblogin=1');
+    array_unshift($qs, 'shiblogin=1');
 
     // build the target url
     $path = \Drupal::request()->getSchemeAndHttpHost() . \Drupal::request()->getBaseUrl() . \Drupal::request()->getPathInfo();
     $shibll = \Drupal::config('uw_auth.settings')->get('login_link');
-    $shibll = Url::fromUserInput($shibll,['absolute' => true, 'https' => true])->toString();
+    $shibll = Url::fromUserInput($shibll, ['absolute' => true, 'https' => true])->toString();
     $shibll = str_replace('CURRENT_PATH', $path, $shibll);
 
-    $shibll .= '?' . implode('&',$qs);
+    $shibll .= '?' . implode('&', $qs);
     return $shibll;
   }
 }
