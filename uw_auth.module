@@ -59,8 +59,13 @@ function uw_auth_preprocess_page(&$vars)
   if ($request->query->get('target') || $request->query->get('shiblogin')) {
     $uri = $request->getSchemeAndHttpHost() . $request->getBaseUrl() . $request->getPathInfo();
 
-    if ($request->query->get('target')) {
-      $uri = $request->query->get('target');
+    if (filter_var($request->query->get('target'), FILTER_VALIDATE_URL)) {
+      // Redirect without the domain, only the path
+      $uriParts = parse_url($request->query->get('target'));
+      $uri = $uriParts["path"];
+      if (isSet($uriParts["query"])) {
+        $uri = $uri . $uriParts["query"];
+      }
     }
     $request->getSession()->save();
 
