@@ -64,7 +64,7 @@ function uw_auth_preprocess_page(&$vars)
       $uriParts = parse_url($request->query->get('target'));
       $uri = $uriParts["path"];
       if (isSet($uriParts["query"])) {
-        $uri = $uri . $uriParts["query"];
+        $uri = $uri . '?' . $uriParts["query"];
       }
     }
     $request->getSession()->save();
