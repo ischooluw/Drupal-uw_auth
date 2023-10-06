@@ -61,12 +61,18 @@ function uw_auth_preprocess_page(&$vars)
 
     if (filter_var($request->query->get('target'), FILTER_VALIDATE_URL)) {
       // Redirect without the domain, only the path
+
       $uriParts = parse_url($request->query->get('target'));
       $uri = $uriParts["path"];
+
       if (isSet($uriParts["query"])) {
         $uri = $uri . '?' . $uriParts["query"];
+        if (isSet($uriParts["fragment"])) {
+          $uri = $uri . '#' . $uriParts["fragment"];
+        }
       }
     }
+
     $request->getSession()->save();
 
     $response = new \Symfony\Component\HttpFoundation\RedirectResponse($uri);
