@@ -7,3 +7,13 @@ uw_auth.uw_auth_settings_form:
     _permission: 'administer uw auth'
   options:
     _admin_route: TRUE
+
+uw_auth.login:
+  path: '/uwlogin'
+  defaults:
+    _controller: '\Drupal\uw_auth\Controller\UWLoginController::login'
+    _title: 'UW Login'
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
