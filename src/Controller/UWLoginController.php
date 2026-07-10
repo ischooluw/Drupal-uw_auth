@@ -23,6 +23,11 @@ class UWLoginController extends ControllerBase {
       $redirect = $parts['path'] ?? '/';
       $redirect = $redirect === '' ? '/' : $redirect;
 
+      // prevent off-site redirects
+      if (strpos($redirect, '//') === 0) {
+        $redirect = '/' . ltrim($redirect, '/');
+      }
+
       if (isset($parts['query'])) {
         $redirect .= '?' . $parts['query'];
       }
