@@ -55,20 +55,15 @@ class ShibLoginLink extends BlockBase
   private function _get_shiblink()
   {
 
-    // Preserve Query string
-    $query_string = \Drupal::request()->getQueryString();
-    $qs = (strlen($query_string) >= 1) ? explode('&', $query_string) : array();
-
-    // Prepend shiblogin to query string array
-    array_unshift($qs, 'shiblogin=1');
+    $qs = array('shiblogin=1');
 
     // build the target url
-    $path = \Drupal::request()->getSchemeAndHttpHost() . \Drupal::request()->getBaseUrl() . \Drupal::request()->getPathInfo();
+    $path = \Drupal::request()->getSchemeAndHttpHost() . \Drupal::request()->getRequestUri();
     $shibll = \Drupal::config('uw_auth.settings')->get('login_link');
     $shibll = Url::fromUserInput($shibll, ['absolute' => true, 'https' => true])->toString();
-    $shibll = str_replace('CURRENT_PATH', $path, $shibll);
+    $shibll = str_replace('CURRENT_PATH', rawurlencode($path), $shibll);
 
-    $shibll .= '?' . implode('&', $qs);
+    $shibll .= (strpos($shibll, '?') === FALSE ? '?' : '&') . implode('&', $qs);
     return $shibll;
   }
 }
