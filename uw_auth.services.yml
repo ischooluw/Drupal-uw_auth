@@ -5,3 +5,7 @@ services:
     tags:
       - { name: authentication_provider, provider_id: uw_auth, priority: 100 }
 
+  uw_auth.login_redirect_subscriber:
+    class: Drupal\uw_auth\EventSubscriber\LoginRedirectSubscriber
+    tags:
+      - { name: event_subscriber }
