@@ -1,12 +1,12 @@
 # README #
 
-UW Auth module for Drupal 8 using Drupal AuthenticationServiceProvider implementation. 
+UW Auth module for Drupal 10/11 using Drupal AuthenticationServiceProvider implementation.
 
 This module requires Apache with mod_shib installed and was designed to work with shibd feeding mod_shib. This has only been tested under linux environments (though it could work under windows if something is feeding environment variables to Apache.
 
 ### Requirements ###
 
-* Drupal 8
+* Drupal 10 or 11
 * Apache + mod_shib
 * shibd (or other shibboleth daemon feeding mod_shib)
 * htaccess or apache config change to "turn on" shibboleth (see below)
@@ -16,14 +16,14 @@ This module requires Apache with mod_shib installed and was designed to work wit
 
 * Configuration options for email and username attributes to use from mod_shib exposed through apache as environment variables to PHP (uwnetid and eppn by default)
 * Configuration option for optional auto creation of users who successfully authenticate via shib (off by default)
-* Configuration option for Login path (incase you’re not using the default shib paths).
+* Configuration option for Login path (in case you are not using the default shib paths).
 * Login link block (specific login link for shibboleth logins).
 * Works in tandem with standard local auth
 
 
 ### How do I get set up? ###
 
-* Clone the repo into your modules directory and use the d8-stable branch
+* Clone the repo into your modules directory and use the 11.0.x branch (10.0.x for Drupal 10)
 * Install the module in Drupal 
 * Configuration will appear under System (be sure to give yourself permission)
 * htaccess or Apache config changes (see below)
