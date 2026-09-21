@@ -45,6 +45,7 @@ class LoginRedirectSubscriber implements EventSubscriberInterface {
     }
 
     $event->setResponse(new RedirectResponse($redirect));
+    $event->stopPropagation();
   }
 
   /**

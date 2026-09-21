@@ -16,7 +16,7 @@ This module requires Apache with mod_shib installed and was designed to work wit
 
 * Configuration options for email and username attributes to use from mod_shib exposed through apache as environment variables to PHP (uwnetid and eppn by default)
 * Configuration option for optional auto creation of users who successfully authenticate via shib (off by default)
-* Configuration option for Login path (incase you are not using the default shib paths).
+* Configuration option for Login path (in case you are not using the default shib paths).
 * Login link block (specific login link for shibboleth logins).
 * Works in tandem with standard local auth
 
