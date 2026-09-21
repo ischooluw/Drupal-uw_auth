@@ -2,6 +2,7 @@
 
 namespace Drupal\uw_auth\EventSubscriber;
 
+use Drupal\uw_auth\SafeRedirectTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -11,6 +12,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Redirects post-login requests before page rendering begins.
  */
 class LoginRedirectSubscriber implements EventSubscriberInterface {
+
+  use SafeRedirectTrait;
 
   /**
    * Redirects requests carrying legacy shiblogin or target query parameters.
@@ -34,21 +37,7 @@ class LoginRedirectSubscriber implements EventSubscriberInterface {
     $target = $request->query->get('target');
 
     if (is_string($target) && filter_var($target, FILTER_VALIDATE_URL)) {
-      $parts = parse_url($target);
-      $redirect = $parts['path'] ?? '/';
-      $redirect = $redirect === '' ? '/' : $redirect;
-
-      // Prevent off-site redirects via a scheme-relative path.
-      if (strpos($redirect, '//') === 0) {
-        $redirect = '/' . ltrim($redirect, '/');
-      }
-
-      if (isset($parts['query'])) {
-        $redirect .= '?' . $parts['query'];
-      }
-      if (isset($parts['fragment'])) {
-        $redirect .= '#' . $parts['fragment'];
-      }
+      $redirect = $this->buildSafeRedirectPath(parse_url($target));
     }
 
     if ($request->hasSession()) {
