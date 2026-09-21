@@ -1,7 +1,7 @@
 name: UW Auth
 type: module
 description: UW Auth via weblogin
-core_version_requirement: ^8.8 || ^9 || ^10 || ^11
+core_version_requirement: ^10 || ^11
 
 package: UW iSchool
 dependencies:
