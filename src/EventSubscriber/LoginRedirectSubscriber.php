@@ -38,6 +38,11 @@ class LoginRedirectSubscriber implements EventSubscriberInterface {
       $redirect = $parts['path'] ?? '/';
       $redirect = $redirect === '' ? '/' : $redirect;
 
+      // Prevent off-site redirects via a scheme-relative path.
+      if (strpos($redirect, '//') === 0) {
+        $redirect = '/' . ltrim($redirect, '/');
+      }
+
       if (isset($parts['query'])) {
         $redirect .= '?' . $parts['query'];
       }
